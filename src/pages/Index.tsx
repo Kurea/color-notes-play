@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import MusicSheet from '@/components/MusicSheet';
 import NoteEditor from '@/components/NoteEditor';
 import MicrophoneControl from '@/components/MicrophoneControl';
+import SheetManager from '@/components/SheetManager';
 import { Note, getDefaultNotes, getBaseNoteName } from '@/utils/musicTheory';
 import { 
   AudioContextType, 
@@ -40,6 +41,11 @@ const Index = () => {
   const handleClearNotes = () => {
     setNotes([]);
     toast('All notes cleared');
+  };
+
+  // Load notes from a saved sheet
+  const handleLoadNotes = (loadedNotes: Note[]) => {
+    setNotes(loadedNotes);
   };
   
   // Update active notes based on microphone input
@@ -143,7 +149,7 @@ const Index = () => {
         <div className="mb-6 animate-slide-up">
           <h1 className="text-3xl font-semibold mb-2 tracking-tight">Chromatic Sheet Player</h1>
           <p className="text-lg text-muted-foreground">
-            Create simple music sheets and play them on your piano
+            Create, save, and play music sheets on your piano
           </p>
         </div>
         
@@ -160,6 +166,12 @@ const Index = () => {
               onMicrophoneToggle={handleMicrophoneToggle}
               detectedNote={detectedNote}
               signalStrength={signalStrength}
+            />
+            
+            <SheetManager
+              notes={notes}
+              onLoadNotes={handleLoadNotes}
+              onClearNotes={handleClearNotes}
             />
             
             <NoteEditor 
