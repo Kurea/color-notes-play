@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Note, StaffType } from '@/utils/musicTheory';
 import { Music } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import TrebleClef from './TrebleClef';
 
 interface MusicSheetProps {
   notes: Note[];
@@ -160,9 +161,18 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
         className="relative w-full music-sheet rounded-md bg-white/80 border border-gray-200 p-4 overflow-x-auto"
         style={{ height: '240px' }}
       >
-        {/* Fixed clef symbol on the left */}
-        <div className="absolute left-4 top-[48px] text-4xl font-serif opacity-80">
-          {staffType === 'treble' ? 'G' : 'F'}
+        {/* Beautiful treble clef on the left */}
+        <div className="absolute left-2 top-[24px]">
+          {staffType === 'treble' ? (
+            <TrebleClef 
+              color="#9b87f5" 
+              width={48} 
+              height={96} 
+              className="opacity-90"
+            />
+          ) : (
+            <div className="text-4xl font-serif opacity-80">F</div>
+          )}
         </div>
         
         {/* Notes */}
