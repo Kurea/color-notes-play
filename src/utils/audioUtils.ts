@@ -119,7 +119,7 @@ export const detectDominantFrequency = (analyser: AnalyserNodeType): number => {
   }
   
   // Only return if the signal is strong enough
-  if (maxValue < 130) return 0; // Threshold to avoid background noise
+  if (maxValue < 100) return 0; // Lower threshold to increase sensitivity
   
   const nyquist = (analyser.context as AudioContext).sampleRate / 2;
   const frequency = maxIndex * nyquist / bufferLength;
@@ -144,8 +144,8 @@ export const detectNote = (frequency: number): string | null => {
     }
   }
   
-  // If the difference is too large, it's probably not a musical note
-  if (minDifference > 10) return null;
+  // Increase the tolerance for piano detection
+  if (minDifference > 15) return null;
   
   return closestNote;
 };

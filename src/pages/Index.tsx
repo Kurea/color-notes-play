@@ -4,14 +4,13 @@ import Header from '@/components/Header';
 import MusicSheet from '@/components/MusicSheet';
 import NoteEditor from '@/components/NoteEditor';
 import MicrophoneControl from '@/components/MicrophoneControl';
-import { Note, getDefaultNotes } from '@/utils/musicTheory';
+import { Note, getDefaultNotes, getBaseNoteName } from '@/utils/musicTheory';
 import { 
   AudioContextType, 
   AnalyserNodeType,
   initAudioContext, 
   detectDominantFrequency, 
   detectNote,
-  getSimpleNoteName
 } from '@/utils/audioUtils';
 import { toast } from 'sonner';
 
@@ -44,13 +43,26 @@ const Index = () => {
   };
   
   // Update active notes based on microphone input
-  const updateActiveNotes = (detectedSimpleNote: string | null) => {
-    setNotes(prevNotes => 
-      prevNotes.map(note => ({
-        ...note,
-        isActive: note.value === detectedSimpleNote
-      }))
-    );
+  const updateActiveNotes = (detectedNoteString: string | null) => {
+    const baseNoteName = getBaseNoteName(detectedNoteString);
+    console.log("Detected note base name:", baseNoteName);
+    
+    if (baseNoteName) {
+      setNotes(prevNotes => 
+        prevNotes.map(note => ({
+          ...note,
+          isActive: note.value === baseNoteName
+        }))
+      );
+    } else {
+      // If no note is detected, deactivate all notes
+      setNotes(prevNotes => 
+        prevNotes.map(note => ({
+          ...note,
+          isActive: false
+        }))
+      );
+    }
   };
   
   // Toggle microphone
@@ -69,7 +81,6 @@ const Index = () => {
           // Detect frequency and corresponding note
           const frequency = detectDominantFrequency(audioContextRef.current.analyser);
           const currentNote = detectNote(frequency);
-          const simpleNote = getSimpleNoteName(currentNote);
           
           // Calculate signal strength from frequency (0-100)
           const strength = Math.min(100, Math.max(0, frequency / 10));
@@ -77,7 +88,7 @@ const Index = () => {
           
           // Update detected note and active notes
           setDetectedNote(currentNote);
-          updateActiveNotes(simpleNote);
+          updateActiveNotes(currentNote);
           
           // Continue the loop
           animationFrameRef.current = requestAnimationFrame(processAudio);
@@ -140,7 +151,7 @@ const Index = () => {
           <div className="md:col-span-2">
             <MusicSheet 
               notes={notes} 
-              activeNote={getSimpleNoteName(detectedNote)}
+              activeNote={getBaseNoteName(detectedNote)}
             />
           </div>
           

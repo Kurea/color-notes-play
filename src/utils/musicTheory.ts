@@ -92,6 +92,16 @@ export const parseNoteString = (noteString: string): { value: string; octave: nu
   return { value, octave, accidental };
 };
 
+// Get the base note name (C, D, E, etc.) from a full note name (C4, D#3, etc.)
+export const getBaseNoteName = (noteName: string | null): string | null => {
+  if (!noteName) return null;
+  
+  const match = noteName.match(/^([A-Ga-g])/i);
+  if (!match) return null;
+  
+  return match[1].toLowerCase();
+};
+
 // Default music sheet data
 export const getDefaultNotes = (): Note[] => {
   return [
