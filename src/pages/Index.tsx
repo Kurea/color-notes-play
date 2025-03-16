@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import MusicSheet from '@/components/MusicSheet';
@@ -21,7 +20,6 @@ const Index = () => {
   const [detectedNote, setDetectedNote] = useState<string | null>(null);
   const [signalStrength, setSignalStrength] = useState(0);
   
-  // Refs for audio context and analyzer
   const audioContextRef = useRef<{
     audioContext: AudioContextType;
     analyser: AnalyserNodeType;
@@ -29,26 +27,21 @@ const Index = () => {
     stop: () => void;
   }>(initAudioContext());
   
-  // Animation frame reference for the audio processing loop
   const animationFrameRef = useRef<number | null>(null);
   
-  // Add a new note to the sheet
   const handleAddNote = (newNote: Note) => {
     setNotes(prevNotes => [...prevNotes, newNote]);
   };
   
-  // Clear all notes from the sheet
   const handleClearNotes = () => {
     setNotes([]);
     toast('All notes cleared');
   };
 
-  // Load notes from a saved sheet
   const handleLoadNotes = (loadedNotes: Note[]) => {
     setNotes(loadedNotes);
   };
   
-  // Update active notes based on microphone input
   const updateActiveNotes = (detectedNoteString: string | null) => {
     const baseNoteName = getBaseNoteName(detectedNoteString);
     console.log("Detected note base name:", baseNoteName);
@@ -61,7 +54,6 @@ const Index = () => {
         }))
       );
     } else {
-      // If no note is detected, deactivate all notes
       setNotes(prevNotes => 
         prevNotes.map(note => ({
           ...note,
@@ -71,36 +63,28 @@ const Index = () => {
     }
   };
   
-  // Toggle microphone
   const handleMicrophoneToggle = async (isActive: boolean) => {
     setMicrophoneActive(isActive);
     
     if (isActive) {
       try {
-        // Start audio processing
         await audioContextRef.current.start();
         
-        // Start audio processing loop
         const processAudio = () => {
           if (!audioContextRef.current.analyser) return;
           
-          // Detect frequency and corresponding note
           const frequency = detectDominantFrequency(audioContextRef.current.analyser);
           const currentNote = detectNote(frequency);
           
-          // Calculate signal strength from frequency (0-100)
           const strength = Math.min(100, Math.max(0, frequency / 10));
           setSignalStrength(strength);
           
-          // Update detected note and active notes
           setDetectedNote(currentNote);
           updateActiveNotes(currentNote);
           
-          // Continue the loop
           animationFrameRef.current = requestAnimationFrame(processAudio);
         };
         
-        // Start the processing loop
         animationFrameRef.current = requestAnimationFrame(processAudio);
       } catch (error) {
         console.error('Error starting audio processing:', error);
@@ -108,20 +92,16 @@ const Index = () => {
         toast.error('Failed to start audio processing');
       }
     } else {
-      // Stop the processing loop
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
       
-      // Stop audio context
       audioContextRef.current.stop();
       
-      // Reset state
       setDetectedNote(null);
       setSignalStrength(0);
       
-      // Reset active notes
       setNotes(prevNotes => 
         prevNotes.map(note => ({
           ...note,
@@ -131,7 +111,6 @@ const Index = () => {
     }
   };
   
-  // Clean up on unmount
   useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
@@ -168,14 +147,14 @@ const Index = () => {
               signalStrength={signalStrength}
             />
             
-            <SheetManager
-              notes={notes}
-              onLoadNotes={handleLoadNotes}
+            <NoteEditor 
+              onAddNote={handleAddNote} 
               onClearNotes={handleClearNotes}
             />
             
-            <NoteEditor 
-              onAddNote={handleAddNote} 
+            <SheetManager
+              notes={notes}
+              onLoadNotes={handleLoadNotes}
               onClearNotes={handleClearNotes}
             />
           </div>

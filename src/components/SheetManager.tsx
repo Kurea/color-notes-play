@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { Json } from '@/integrations/supabase/types';
 
 interface SheetManagerProps {
   notes: Note[];
@@ -79,7 +80,13 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
         return;
       }
 
-      setSheets(data as MusicSheet[]);
+      // Convert the JSON data from Supabase to our MusicSheet type
+      const convertedSheets = data.map((sheet: any) => ({
+        ...sheet,
+        notes: sheet.notes as Note[]
+      }));
+
+      setSheets(convertedSheets as MusicSheet[]);
     } catch (error) {
       console.error('Error in fetchUserSheets:', error);
       toast.error('An unexpected error occurred');
@@ -106,13 +113,16 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
     setIsLoading(true);
 
     try {
+      // Convert notes to the format expected by Supabase
+      const sheetData = {
+        title: newSheetTitle,
+        notes: notes as unknown as Json,
+        user_id: user.id
+      };
+
       const { data, error } = await supabase
         .from('music_sheets')
-        .insert({
-          title: newSheetTitle,
-          notes: notes,
-          user_id: user.id
-        })
+        .insert(sheetData)
         .select();
 
       if (error) {
