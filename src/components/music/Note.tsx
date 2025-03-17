@@ -30,9 +30,9 @@ const Note: React.FC<NoteProps> = ({ note }) => {
     // In a more complete implementation, you'd use proper musical notation symbols
     switch (note.duration) {
       case 'whole':
-        return <div className="w-8 h-8 rounded-full border-2 border-current" />;
-      case 'half':
         return <div className="w-8 h-8 rounded-full border-2 border-current bg-white" />;
+      case 'half':
+        return <div className="w-8 h-8 rounded-full bg-current" />;
       case 'quarter':
         return (
           <div className="flex items-start">
