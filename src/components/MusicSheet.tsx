@@ -48,8 +48,8 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
       
       <div 
         ref={sheetRef}
-        className="relative w-full music-sheet rounded-md bg-white/80 border border-gray-200 p-4 overflow-x-auto"
-        style={{ height: '240px' }}
+        className="relative w-full music-sheet rounded-md bg-white/80 border border-gray-200 p-4 overflow-x-auto overflow-y-hidden"
+        style={{ height: '250px' }}
       >
         {/* Clef on the left */}
         <StaffClef staffType={staffType} />

@@ -1,3 +1,6 @@
+/* Font loading */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
 
 @tailwind base;
 @tailwind components;
@@ -97,13 +100,8 @@
     position: relative;
   }
 
-  .music-sheet::before {
+  .music-sheet {
     content: "";
-    position: absolute;
-    top: 64px;
-    left: 0;
-    right: 0;
-    bottom: 0;
     background-image: 
       linear-gradient(
         180deg,
@@ -123,12 +121,16 @@
         transparent 128px,
         #e5e7eb 128px,
         #e5e7eb 129px,
-        transparent 129px
+        transparent 129px,
+        transparent 160px,
+        #e5e7eb 160px,
+        #e5e7eb 161px,
+        transparent 161px
       );
-    background-size: 100% 129px;
+    background-size: cover;
     z-index: 0;
-    pointer-events: none;
   }
+
 
   /* Glass morphism styles */
   .glass {
@@ -155,5 +157,3 @@
   }
 }
 
-/* Font loading */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
