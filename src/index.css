@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -99,7 +100,7 @@
   .music-sheet::before {
     content: "";
     position: absolute;
-    top: 50px;
+    top: 64px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -107,24 +108,24 @@
       linear-gradient(
         180deg,
         transparent 0px,
-        transparent 16px,
-        #e5e7eb 16px,
-        #e5e7eb 17px,
-        transparent 17px,
         transparent 32px,
         #e5e7eb 32px,
         #e5e7eb 33px,
         transparent 33px,
-        transparent 48px,
-        #e5e7eb 48px,
-        #e5e7eb 49px,
-        transparent 49px,
         transparent 64px,
         #e5e7eb 64px,
         #e5e7eb 65px,
-        transparent 65px
+        transparent 65px,
+        transparent 96px,
+        #e5e7eb 96px,
+        #e5e7eb 97px,
+        transparent 97px,
+        transparent 128px,
+        #e5e7eb 128px,
+        #e5e7eb 129px,
+        transparent 129px
       );
-    background-size: 100% 65px;
+    background-size: 100% 129px;
     z-index: 0;
     pointer-events: none;
   }

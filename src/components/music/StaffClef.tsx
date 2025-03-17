@@ -9,11 +9,11 @@ interface StaffClefProps {
 
 const StaffClef: React.FC<StaffClefProps> = ({ staffType }) => {
   return (
-    <div className="absolute left-2 top-[16px]">
+    <div className="absolute left-2 top-[24px]">
       {staffType === 'treble' ? (
         <TrebleClef 
-          width={90} 
-          height={120} 
+          width={95} 
+          height={170} 
           className="opacity-90 clef" 
         />
       ) : (

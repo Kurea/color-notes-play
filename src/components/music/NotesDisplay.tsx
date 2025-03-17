@@ -9,7 +9,7 @@ interface NotesDisplayProps {
 
 const NotesDisplay: React.FC<NotesDisplayProps> = ({ notes }) => {
   return (
-    <div className="flex items-start pl-16 gap-14 mt-12">
+    <div className="flex items-start pl-16 gap-14 mt-6">
       {notes.map((note) => (
         <Note key={note.id} note={note} />
       ))}
