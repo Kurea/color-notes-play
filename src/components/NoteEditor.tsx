@@ -1,8 +1,11 @@
 
 import React, { useState } from 'react';
-import { PlusCircle, Trash2, Music2, ArrowLeftRight } from 'lucide-react';
+import { Music2 } from 'lucide-react';
 import { Note, createNote, parseNoteString } from '@/utils/musicTheory';
 import { toast } from 'sonner';
+import NoteInput from './music/NoteInput';
+import DurationSelector from './music/DurationSelector';
+import ClearNotesButton from './music/ClearNotesButton';
 
 interface NoteEditorProps {
   onAddNote: (note: Note) => void;
@@ -13,14 +16,6 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onAddNote, onClearNotes }) => {
   const [noteInput, setNoteInput] = useState('');
   const [duration, setDuration] = useState<Note['duration']>('quarter');
   
-  const durations: Array<[Note['duration'], string]> = [
-    ['whole', 'Whole'],
-    ['half', 'Half'],
-    ['quarter', 'Quarter'],
-    ['eighth', 'Eighth'],
-    ['sixteenth', 'Sixteenth'],
-  ];
-
   const handleAddNote = () => {
     if (!noteInput.trim()) {
       toast.error('Please enter a note (e.g., C4)');
@@ -45,50 +40,18 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onAddNote, onClearNotes }) => {
         <span>Note Editor</span>
       </h3>
       
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          value={noteInput}
-          onChange={(e) => setNoteInput(e.target.value)}
-          placeholder="Enter note (e.g., C4)"
-          className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleAddNote();
-          }}
-        />
-        
-        <button
-          onClick={handleAddNote}
-          className="h-9 px-4 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors flex items-center gap-1.5"
-        >
-          <PlusCircle className="h-4 w-4" />
-          <span className="text-sm">Add</span>
-        </button>
-      </div>
+      <NoteInput
+        noteInput={noteInput}
+        onNoteInputChange={setNoteInput}
+        onAddNote={handleAddNote}
+      />
       
-      <div className="grid grid-cols-3 gap-2">
-        {durations.map(([value, label]) => (
-          <button
-            key={value}
-            onClick={() => setDuration(value)}
-            className={`text-xs py-1 px-2 rounded-md transition-colors ${
-              duration === value
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-        
-        <button
-          onClick={onClearNotes}
-          className="col-span-3 flex items-center justify-center gap-1.5 mt-2 text-xs text-destructive hover:text-destructive/80 transition-colors"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-          <span>Clear all notes</span>
-        </button>
-      </div>
+      <DurationSelector
+        selectedDuration={duration}
+        onDurationChange={setDuration}
+      />
+      
+      <ClearNotesButton onClearNotes={onClearNotes} />
     </div>
   );
 };
