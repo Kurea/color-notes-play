@@ -44,18 +44,18 @@ const Note: React.FC<NoteProps> = ({ note }) => {
         return (
           <div className="flex items-start">
             <div className="w-8 h-8 rounded-full bg-current" />
-            <div className="h-16 w-0.5 bg-current -ml-1 -translate-y-1/2" />
-            <div className="h-8 w-8 border-t-2 border-current rounded-tr-full -ml-0.5 mt-4 -translate-y-1/2" />
+            <div className="relative h-16 w-0.5 bg-current -ml-1 -translate-y-1/2">
+              <div className="absolute h-8 w-8 border-b-2 border-current rounded-bl-full right-0 top-0" />
+            </div>
           </div>
         );
       case 'sixteenth':
         return (
           <div className="flex items-start">
             <div className="w-8 h-8 rounded-full bg-current" />
-            <div className="h-16 w-0.5 bg-current -ml-1 -translate-y-1/2" />
-            <div className="flex flex-col -ml-0.5 mt-4 -translate-y-1/2">
-              <div className="w-8 h-8 border-t-2 border-current rounded-tr-full" />
-              <div className="w-8 h-8 border-t-2 border-current rounded-tr-full" />
+            <div className="relative h-16 w-0.5 bg-current -ml-1 -translate-y-1/2">
+              <div className="absolute h-4 w-8 border-b-2 border-current rounded-bl-full right-0 top-0" />
+              <div className="absolute h-4 w-8 border-b-2 border-current rounded-bl-full right-0 top-4" />
             </div>
           </div>
         );
