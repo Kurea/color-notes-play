@@ -80,11 +80,16 @@
     @apply w-full h-[1px] bg-gray-300;
   }
 
+  .clef {
+
+  }
+
   .note {
     @apply relative transition-all ease-spring duration-300;
   }
 
   .note-active {
+    color: hsl(var(--primary));
     @apply animate-note-highlight;
   }
 
@@ -92,9 +97,9 @@
     background-image: repeating-linear-gradient(
       180deg,
       transparent,
-      transparent 28px,
-      #e5e7eb 28px,
-      #e5e7eb 29px
+      transparent 31px,
+      #e5e7eb 31px,
+      #e5e7eb 32px
     );
   }
 

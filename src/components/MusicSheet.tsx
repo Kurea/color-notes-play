@@ -8,13 +8,11 @@ import TrebleClef from './TrebleClef';
 interface MusicSheetProps {
   notes: Note[];
   staffType?: StaffType;
-  activeNote: string | null;
 }
 
 const MusicSheet: React.FC<MusicSheetProps> = ({
   notes,
   staffType = 'treble',
-  activeNote,
 }) => {
   const sheetRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -41,8 +39,8 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
     // Each line/space is 16px apart
     // Staff has 5 lines, with notes possibly extending above and below
     // Position 0 = bottom line of staff
-    const lineHeight = 16;
-    const basePosition = 4 * lineHeight; // Bottom line position
+    const lineHeight = 32;
+    const basePosition = 4 * lineHeight-25; // Bottom line position
     
     // Calculate vertical position (higher position = lower on staff)
     const topPosition = basePosition - (note.position * lineHeight / 2);
@@ -56,37 +54,37 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
     // In a more complete implementation, you'd use proper musical notation symbols
     switch (note.duration) {
       case 'whole':
-        return <div className="w-7 h-4 rounded-full border-2 border-current" />;
+        return <div className="w-8 h-8 rounded-full border-2 border-current" />;
       case 'half':
-        return <div className="w-7 h-4 rounded-full border-2 border-current bg-white" />;
+        return <div className="w-8 h-8 rounded-full border-2 border-current bg-white" />;
       case 'quarter':
         return (
-          <div className="flex items-center">
-            <div className="w-7 h-4 rounded-full bg-current" />
-            <div className="h-16 w-0.5 bg-current -ml-1" />
+          <div className="flex items-start">
+            <div className="w-8 h-8 rounded-full bg-current" />
+            <div className="h-16 w-0.5 bg-current -ml-1 -translate-y-1/2" />
           </div>
         );
       case 'eighth':
         return (
-          <div className="flex items-center">
-            <div className="w-7 h-4 rounded-full bg-current" />
-            <div className="h-16 w-0.5 bg-current -ml-1" />
-            <div className="h-8 w-4 border-b-2 border-current rounded-br-full -ml-0.5 mt-4" />
+          <div className="flex items-start">
+            <div className="w-8 h-8 rounded-full bg-current" />
+            <div className="h-16 w-0.5 bg-current -ml-1 -translate-y-1/2" />
+            <div className="h-8 w-8 border-t-2 border-current rounded-tr-full -ml-0.5 mt-4 -translate-y-1/2" />
           </div>
         );
       case 'sixteenth':
         return (
-          <div className="flex items-center">
-            <div className="w-7 h-4 rounded-full bg-current" />
-            <div className="h-16 w-0.5 bg-current -ml-1" />
-            <div className="flex flex-col -ml-0.5 mt-4">
-              <div className="h-4 w-4 border-b-2 border-current rounded-br-full" />
-              <div className="h-4 w-4 border-b-2 border-current rounded-br-full" />
+          <div className="flex items-start">
+            <div className="w-8 h-8 rounded-full bg-current" />
+            <div className="h-16 w-0.5 bg-current -ml-1 -translate-y-1/2" />
+            <div className="flex flex-col -ml-0.5 mt-4 -translate-y-1/2">
+              <div className="w-8 h-8 border-t-2 border-current rounded-tr-full" />
+              <div className="w-8 h-8 border-t-2 border-current rounded-tr-full" />
             </div>
           </div>
         );
       default:
-        return <div className="w-7 h-4 rounded-full bg-current" />;
+        return <div className="w-8 h-8 rounded-full bg-current" />;
     }
   };
 
@@ -124,7 +122,7 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
           <div 
             key={`ledger-${i}`} 
             className="absolute w-10 h-0.5 bg-gray-300 left-1/2 -translate-x-1/2"
-            style={{ top: `${4 * 16 - (i * 8)}px` }}
+            style={{ top: `${(-i * 8)}px` }}
           />
         );
       }
@@ -135,7 +133,7 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
           <div 
             key={`ledger-${i}`} 
             className="absolute w-10 h-0.5 bg-gray-300 left-1/2 -translate-x-1/2"
-            style={{ top: `${4 * 16 - (i * 8)}px` }}
+            style={{ top: `${(-i * 8)}px` }}
           />
         );
       }
@@ -165,10 +163,9 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
         <div className="absolute left-2 top-[24px]">
           {staffType === 'treble' ? (
             <TrebleClef 
-              color="#9b87f5" 
-              width={48} 
-              height={96} 
-              className="opacity-90"
+              width={95} 
+              height={170} 
+              className="opacity-90 clef"
             />
           ) : (
             <div className="text-4xl font-serif opacity-80">F</div>
@@ -178,7 +175,7 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
         {/* Notes */}
         <div className="flex items-start pl-16 gap-14 mt-6">
           {notes.map((note, index) => {
-            const isActive = activeNote?.toLowerCase() === note.value;
+            const isActive = note.isActive;
             
             return (
               <div 

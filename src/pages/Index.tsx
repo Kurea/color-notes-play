@@ -44,32 +44,36 @@ const Index = () => {
   
   const updateActiveNotes = (detectedNoteString: string | null) => {
     const baseNoteName = getBaseNoteName(detectedNoteString);
-    console.log("Detected note base name:", baseNoteName);
+    const nextNoteIndex = notes.findIndex(note => note.isActive === false);
+    const nextNote = notes[nextNoteIndex];
     
-    if (baseNoteName) {
-      setNotes(prevNotes => 
-        prevNotes.map(note => ({
-          ...note,
-          isActive: note.value === baseNoteName
-        }))
-      );
-    } else {
-      setNotes(prevNotes => 
-        prevNotes.map(note => ({
-          ...note,
-          isActive: false
-        }))
-      );
+    if (baseNoteName && nextNote) {
+      console.log("Detected note base name:", baseNoteName);
+      console.log("Next note:", nextNote.value);
+      if(baseNoteName === nextNote.value) {
+        setNotes(prevNotes => {
+          prevNotes[nextNoteIndex].isActive = true;
+          return prevNotes;
+        }
+        );
+      }
     }
   };
   
   const handleMicrophoneToggle = async (isActive: boolean) => {
     setMicrophoneActive(isActive);
-    
+
     if (isActive) {
       try {
+        setNotes(prevNotes => 
+          prevNotes.map(note => ({
+            ...note,
+            isActive: false
+          }))
+        );
+
         await audioContextRef.current.start();
-        
+
         const processAudio = () => {
           if (!audioContextRef.current.analyser) return;
           
@@ -84,7 +88,7 @@ const Index = () => {
           
           animationFrameRef.current = requestAnimationFrame(processAudio);
         };
-        
+
         animationFrameRef.current = requestAnimationFrame(processAudio);
       } catch (error) {
         console.error('Error starting audio processing:', error);
@@ -101,13 +105,6 @@ const Index = () => {
       
       setDetectedNote(null);
       setSignalStrength(0);
-      
-      setNotes(prevNotes => 
-        prevNotes.map(note => ({
-          ...note,
-          isActive: false
-        }))
-      );
     }
   };
   
@@ -136,7 +133,6 @@ const Index = () => {
           <div className="md:col-span-2">
             <MusicSheet 
               notes={notes} 
-              activeNote={getBaseNoteName(detectedNote)}
             />
           </div>
           

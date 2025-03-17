@@ -48,12 +48,7 @@ const NOTE_FREQUENCIES: Record<string, number> = {
 };
 
 // Initialize audio context and analyzer
-export const initAudioContext = (): { 
-  audioContext: AudioContextType; 
-  analyser: AnalyserNodeType;
-  start: () => Promise<void>;
-  stop: () => void;
-} => {
+export const initAudioContext = () => {
   let audioContext: AudioContextType = null;
   let analyser: AnalyserNodeType = null;
   let mediaStream: MediaStream | null = null;
@@ -69,7 +64,7 @@ export const initAudioContext = (): {
       mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       source = audioContext.createMediaStreamSource(mediaStream);
       source.connect(analyser);
-      
+
       console.log("Microphone connected successfully");
     } catch (error) {
       console.error("Error initializing audio:", error);
@@ -96,7 +91,16 @@ export const initAudioContext = (): {
     analyser = null;
   };
 
-  return { audioContext, analyser, start, stop };
+  return {
+    get audioContext() {
+      return audioContext;
+    },
+    get analyser() {
+      return analyser;
+    },
+    start,
+    stop,
+  };
 };
 
 // Detect the dominant frequency from audio data
