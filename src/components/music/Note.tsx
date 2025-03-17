@@ -15,8 +15,8 @@ const Note: React.FC<NoteProps> = ({ note }) => {
     // Each line/space is 16px apart
     // Staff has 5 lines, with notes possibly extending above and below
     // Position 0 = bottom line of staff
-    const lineHeight = 32;
-    const basePosition = 4 * lineHeight - 25; // Bottom line position
+    const lineHeight = 16;
+    const basePosition = 4 * lineHeight; // Bottom line position
     
     // Calculate vertical position (higher position = lower on staff)
     const topPosition = basePosition - (note.position * lineHeight / 2);
