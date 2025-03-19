@@ -26,7 +26,7 @@ const NotesDisplay: React.FC<NotesDisplayProps> = ({ notes, selectedNoteId, onSe
   }, [notes.length]); // Only run when the number of notes changes
 
   return (
-    <ScrollArea className="w-full" ref={scrollAreaRef}>
+    <ScrollArea className="w-full h-full" ref={scrollAreaRef}>
       <div 
         ref={containerRef} 
         className="flex items-start pl-16 pr-16 gap-14 mt-6 notes-display min-w-max"
