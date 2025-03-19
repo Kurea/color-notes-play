@@ -119,7 +119,6 @@ const Index = () => {
         );
 
         await audioContextRef.current.start();
-        setListenerName("Active Listener");
 
         const processAudio = () => {
           if (!audioContextRef.current.analyser) return;
@@ -149,7 +148,6 @@ const Index = () => {
       }
       
       audioContextRef.current.stop();
-      setListenerName("No listener");
       
       setDetectedNote(null);
       setSignalStrength(0);
@@ -182,11 +180,14 @@ const Index = () => {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <FileMusic className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-medium">{sheetName}</h2>
+              <h2 className="text-3xl font-medium">{sheetName}</h2>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Headphones className="h-4 w-4" />
-              <span>{listenerName}</span>
+            <div className="flex items-center gap-2 ">
+              <MicrophoneControl 
+                onMicrophoneToggle={handleMicrophoneToggle}
+                detectedNote={detectedNote}
+                signalStrength={signalStrength}
+              />
             </div>
           </div>
           
@@ -203,14 +204,6 @@ const Index = () => {
         {/* Controls section below the sheet */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <div className="md:col-span-1">
-            <MicrophoneControl 
-              onMicrophoneToggle={handleMicrophoneToggle}
-              detectedNote={detectedNote}
-              signalStrength={signalStrength}
-            />
-          </div>
-          
-          <div className="md:col-span-1">
             <NoteEditor 
               onAddNote={handleAddNote}
               onUpdateNote={handleUpdateNote}
@@ -219,7 +212,8 @@ const Index = () => {
               selectedNote={selectedNote}
             />
           </div>
-          
+          <div className="md:col-span-1">
+          </div>          
           <div className="md:col-span-1">
             <SheetManager
               notes={notes}
