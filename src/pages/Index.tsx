@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import MusicSheet from '@/components/MusicSheet';
@@ -13,12 +14,15 @@ import {
   detectNote,
 } from '@/utils/audioUtils';
 import { toast } from 'sonner';
+import { FileMusic, Headphones } from 'lucide-react';
 
 const Index = () => {
   const [notes, setNotes] = useState<Note[]>(getDefaultNotes());
   const [microphoneActive, setMicrophoneActive] = useState(false);
   const [detectedNote, setDetectedNote] = useState<string | null>(null);
   const [signalStrength, setSignalStrength] = useState(0);
+  const [sheetName, setSheetName] = useState<string>("Untitled Sheet");
+  const [listenerName, setListenerName] = useState<string>("No listener");
   
   const audioContextRef = useRef<{
     audioContext: AudioContextType;
@@ -38,8 +42,11 @@ const Index = () => {
     toast('All notes cleared');
   };
 
-  const handleLoadNotes = (loadedNotes: Note[]) => {
+  const handleLoadNotes = (loadedNotes: Note[], title?: string) => {
     setNotes(loadedNotes);
+    if (title) {
+      setSheetName(title);
+    }
   };
   
   const updateActiveNotes = (detectedNoteString: string | null) => {
@@ -73,6 +80,7 @@ const Index = () => {
         );
 
         await audioContextRef.current.start();
+        setListenerName("Active Listener");
 
         const processAudio = () => {
           if (!audioContextRef.current.analyser) return;
@@ -102,6 +110,7 @@ const Index = () => {
       }
       
       audioContextRef.current.stop();
+      setListenerName("No listener");
       
       setDetectedNote(null);
       setSignalStrength(0);
@@ -121,7 +130,7 @@ const Index = () => {
     <div className="min-h-screen bg-background overflow-hidden">
       <Header />
       
-      <main className="pt-24 pb-16 px-6 max-w-6xl mx-auto">
+      <main className="pt-20 pb-16 px-6 max-w-7xl mx-auto">
         <div className="mb-6 animate-slide-up">
           <h1 className="text-3xl font-semibold mb-2 tracking-tight">Chromatic Sheet Player</h1>
           <p className="text-lg text-muted-foreground">
@@ -129,25 +138,45 @@ const Index = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
+        {/* Sheet section with name and listener info */}
+        <div className="flex flex-col gap-6 mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <FileMusic className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-medium">{sheetName}</h2>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Headphones className="h-4 w-4" />
+              <span>{listenerName}</span>
+            </div>
+          </div>
+          
+          {/* Enlarged music sheet */}
+          <div className="w-full">
             <MusicSheet 
               notes={notes} 
             />
           </div>
-          
-          <div className="flex flex-col gap-6">
+        </div>
+        
+        {/* Controls section below the sheet */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <div className="md:col-span-1">
             <MicrophoneControl 
               onMicrophoneToggle={handleMicrophoneToggle}
               detectedNote={detectedNote}
               signalStrength={signalStrength}
             />
-            
+          </div>
+          
+          <div className="md:col-span-1">
             <NoteEditor 
               onAddNote={handleAddNote} 
               onClearNotes={handleClearNotes}
             />
-            
+          </div>
+          
+          <div className="md:col-span-1">
             <SheetManager
               notes={notes}
               onLoadNotes={handleLoadNotes}

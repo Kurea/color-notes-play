@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Save, FileText, FolderOpen, Trash2, PlusCircle } from 'lucide-react';
 import { Note } from '@/utils/musicTheory';
@@ -18,7 +17,7 @@ import { Json } from '@/integrations/supabase/types';
 
 interface SheetManagerProps {
   notes: Note[];
-  onLoadNotes: (notes: Note[]) => void;
+  onLoadNotes: (notes: Note[], title: string) => void;
   onClearNotes: () => void;
 }
 
@@ -38,7 +37,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
   const [newSheetTitle, setNewSheetTitle] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check authentication status on component mount
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session);
@@ -51,7 +49,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
       }
     });
 
-    // Initial auth check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session);
       setUser(session?.user || null);
@@ -66,7 +63,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
     };
   }, []);
 
-  // Fetch user's music sheets
   const fetchUserSheets = async () => {
     try {
       const { data, error } = await supabase
@@ -80,7 +76,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
         return;
       }
 
-      // Convert the JSON data from Supabase to our MusicSheet type
       const convertedSheets = data.map((sheet: any) => ({
         ...sheet,
         notes: sheet.notes as Note[]
@@ -93,7 +88,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
     }
   };
 
-  // Save current notes as a new sheet
   const handleSaveSheet = async () => {
     if (!isAuthenticated) {
       toast.error('You must be logged in to save sheets');
@@ -113,7 +107,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
     setIsLoading(true);
 
     try {
-      // Convert notes to the format expected by Supabase
       const sheetData = {
         title: newSheetTitle,
         notes: notes as unknown as Json,
@@ -143,16 +136,14 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
     }
   };
 
-  // Load a selected sheet
   const handleLoadSheet = (sheet: MusicSheet) => {
-    onLoadNotes(sheet.notes);
+    onLoadNotes(sheet.notes, sheet.title);
     setIsOpenDialogOpen(false);
     toast.success(`Loaded "${sheet.title}"`);
   };
 
-  // Delete a sheet
   const handleDeleteSheet = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering the parent onClick
+    e.stopPropagation();
     
     if (!confirm('Are you sure you want to delete this sheet?')) {
       return;
@@ -178,15 +169,12 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
     }
   };
 
-  // Create a new empty sheet
   const handleNewSheet = () => {
     onClearNotes();
     toast.success('Created new empty sheet');
   };
 
-  // Sign in or sign up
   const handleAuthClick = () => {
-    // Redirect to login page (will be implemented later)
     toast.info('Authentication will be implemented soon');
   };
 
@@ -242,7 +230,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
         )}
       </div>
 
-      {/* Save Dialog */}
       <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -269,7 +256,6 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
         </DialogContent>
       </Dialog>
 
-      {/* Open Dialog */}
       <Dialog open={isOpenDialogOpen} onOpenChange={setIsOpenDialogOpen}>
         <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
