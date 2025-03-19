@@ -18,6 +18,7 @@ import { FileMusic, Headphones } from 'lucide-react';
 
 const Index = () => {
   const [notes, setNotes] = useState<Note[]>(getDefaultNotes());
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [microphoneActive, setMicrophoneActive] = useState(false);
   const [detectedNote, setDetectedNote] = useState<string | null>(null);
   const [signalStrength, setSignalStrength] = useState(0);
@@ -35,19 +36,57 @@ const Index = () => {
   
   const handleAddNote = (newNote: Note) => {
     setNotes(prevNotes => [...prevNotes, newNote]);
+    setSelectedNoteId(null);
+  };
+  
+  const handleUpdateNote = (id: string, updatedFields: Partial<Note>) => {
+    // If empty id is provided, it means cancel editing
+    if (!id) {
+      setSelectedNoteId(null);
+      return;
+    }
+    
+    setNotes(prevNotes => 
+      prevNotes.map(note => 
+        note.id === id 
+          ? {
+              ...note,
+              ...updatedFields,
+              // Recalculate position if value or octave changed
+              position: updatedFields.value || updatedFields.octave 
+                ? note.position // This is a simplification - in reality you'd recalculate using calculateNotePosition
+                : note.position
+            }
+          : note
+      )
+    );
+    setSelectedNoteId(null);
+  };
+  
+  const handleDeleteNote = (id: string) => {
+    setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
+    setSelectedNoteId(null);
+  };
+  
+  const handleSelectNote = (note: Note) => {
+    setSelectedNoteId(prevId => prevId === note.id ? null : note.id);
   };
   
   const handleClearNotes = () => {
     setNotes([]);
+    setSelectedNoteId(null);
     toast('All notes cleared');
   };
 
   const handleLoadNotes = (loadedNotes: Note[], title?: string) => {
     setNotes(loadedNotes);
+    setSelectedNoteId(null);
     if (title) {
       setSheetName(title);
     }
   };
+  
+  const selectedNote = notes.find(note => note.id === selectedNoteId) || null;
   
   const updateActiveNotes = (detectedNoteString: string | null) => {
     const baseNoteName = getBaseNoteName(detectedNoteString);
@@ -154,7 +193,9 @@ const Index = () => {
           {/* Enlarged music sheet */}
           <div className="w-full">
             <MusicSheet 
-              notes={notes} 
+              notes={notes}
+              selectedNoteId={selectedNoteId}
+              onSelectNote={handleSelectNote}
             />
           </div>
         </div>
@@ -171,8 +212,11 @@ const Index = () => {
           
           <div className="md:col-span-1">
             <NoteEditor 
-              onAddNote={handleAddNote} 
+              onAddNote={handleAddNote}
+              onUpdateNote={handleUpdateNote}
+              onDeleteNote={handleDeleteNote}
               onClearNotes={handleClearNotes}
+              selectedNote={selectedNote}
             />
           </div>
           

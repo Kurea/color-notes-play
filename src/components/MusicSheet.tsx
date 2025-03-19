@@ -7,11 +7,15 @@ import NotesDisplay from './music/NotesDisplay';
 interface MusicSheetProps {
   notes: Note[];
   staffType?: StaffType;
+  selectedNoteId: string | null;
+  onSelectNote: (note: Note) => void;
 }
 
 const MusicSheet: React.FC<MusicSheetProps> = ({
   notes,
   staffType = 'treble',
+  selectedNoteId,
+  onSelectNote
 }) => {
   const sheetRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -44,7 +48,11 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
         <StaffClef staffType={staffType} />
         
         {/* Notes */}
-        <NotesDisplay notes={notes} />
+        <NotesDisplay 
+          notes={notes} 
+          selectedNoteId={selectedNoteId}
+          onSelectNote={onSelectNote}
+        />
       </div>
     </div>
   );

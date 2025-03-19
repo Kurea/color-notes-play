@@ -5,9 +5,11 @@ import { cn } from '@/lib/utils';
 
 interface NoteProps {
   note: NoteType;
+  isSelected: boolean;
+  onSelect: (note: NoteType) => void;
 }
 
-const Note: React.FC<NoteProps> = ({ note }) => {
+const Note: React.FC<NoteProps> = ({ note, isSelected, onSelect }) => {
   const isActive = note.isActive;
   
   // Calculate note position on staff
@@ -123,13 +125,19 @@ const Note: React.FC<NoteProps> = ({ note }) => {
     return <>{lines}</>;
   };
 
+  const handleClick = () => {
+    onSelect(note);
+  };
+
   return (
     <div 
       className={cn(
-        "note relative", 
-        isActive ? "note-active" : ""
+        "note relative cursor-pointer", 
+        isActive ? "note-active" : "",
+        isSelected ? "ring-2 ring-offset-1 ring-primary" : ""
       )}
       style={{ top: getNoteTopPosition(note) }}
+      onClick={handleClick}
     >
       <div 
         className={cn(
