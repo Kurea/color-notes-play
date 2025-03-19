@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -14,13 +14,22 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Note } from '@/utils/musicTheory';
 import { Json } from '@/integrations/supabase/types';
+import { Currency } from 'lucide-react';
+
+interface MusicSheet {
+  id: string;
+  title: string;
+  notes: Note[];
+  created_at: string;
+}
 
 interface SaveSheetDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   notes: Note[];
+  currentSheet: MusicSheet;
   userId: string | undefined;
-  onSaveSheet: (title: string) => void;
+  onSaveSheet: (sheet: MusicSheet) => void;
   onSheetSaved: () => void;
 }
 
@@ -28,12 +37,17 @@ const SaveSheetDialog: React.FC<SaveSheetDialogProps> = ({
   isOpen,
   onOpenChange,
   notes,
+  currentSheet,
   userId,
   onSaveSheet,
   onSheetSaved
 }) => {
-  const [newSheetTitle, setNewSheetTitle] = useState('');
+  const [newSheetTitle, setNewSheetTitle] = useState((currentSheet)?currentSheet.title:'');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setNewSheetTitle((currentSheet)?currentSheet.title:'');
+  }, [currentSheet]);
 
   const handleSaveSheet = async () => {
     if (!userId) {
@@ -59,10 +73,12 @@ const SaveSheetDialog: React.FC<SaveSheetDialogProps> = ({
         notes: notes as unknown as Json,
         user_id: userId
       };
-
+      if(currentSheet) {
+        sheetData['id'] = currentSheet.id
+      }
       const { data, error } = await supabase
         .from('music_sheets')
-        .insert(sheetData)
+        .upsert(sheetData)
         .select();
 
       if (error) {
@@ -71,9 +87,14 @@ const SaveSheetDialog: React.FC<SaveSheetDialogProps> = ({
         return;
       }
 
+      const convertedSheets = data.map((sheet: any) => ({
+        ...sheet,
+        notes: sheet.notes as Note[]
+      }));
       toast.success('Sheet saved successfully!');
+      onSaveSheet(convertedSheets[0]);
+
       onOpenChange(false);
-      onSaveSheet(newSheetTitle);
       setNewSheetTitle('');
       onSheetSaved();
     } catch (error) {

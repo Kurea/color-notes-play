@@ -11,7 +11,7 @@ import SheetManagerActions from './sheet-manager/SheetManagerActions';
 interface SheetManagerProps {
   notes: Note[];
   onLoadNotes: (notes: Note[], title: string) => void;
-  onSavedNotes: (title: string) => void;
+  onNewTitle: (title: string) => void;
   onClearNotes: () => void;
 }
 
@@ -22,10 +22,11 @@ interface MusicSheet {
   created_at: string;
 }
 
-const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onSavedNotes, onClearNotes }) => {
+const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onNewTitle, onClearNotes }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
   const [sheets, setSheets] = useState<MusicSheet[]>([]);
+  const [currentSheet, setCurrentSheet] = useState<MusicSheet>(null);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [isOpenDialogOpen, setIsOpenDialogOpen] = useState(false);
 
@@ -81,18 +82,22 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onSaved
   };
 
   const handleLoadSheet = (sheet: MusicSheet) => {
+    setCurrentSheet(sheet);
     onLoadNotes(sheet.notes, sheet.title);
     setIsOpenDialogOpen(false);
     toast.success(`Loaded "${sheet.title}"`);
   };
 
-  const handleSaveSheet = (title: string) => {
-    onSavedNotes(title);
-    toast.success(`Saved "${title}"`);
+  const handleSaveSheet = (sheet: MusicSheet) => {
+    onNewTitle(sheet.title);
+    setCurrentSheet(sheet);
+    toast.success(`Saved "${sheet.title}"`);
   }
 
   const handleNewSheet = () => {
     onClearNotes();
+    setCurrentSheet(undefined);
+    onNewTitle(undefined);
     toast.success('Created new empty sheet');
   };
 
@@ -120,6 +125,7 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onSaved
         isOpen={isSaveDialogOpen}
         onOpenChange={setIsSaveDialogOpen}
         notes={notes}
+        currentSheet={currentSheet}
         userId={user?.id}
         onSaveSheet={handleSaveSheet}
         onSheetSaved={fetchUserSheets}

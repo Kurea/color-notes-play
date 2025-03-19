@@ -85,8 +85,8 @@ const Index = () => {
     }
   };
 
-  const handleSaveNotes = (title: string) => {
-    setSheetName(title);
+  const handleNewTitle = (title: string) => {
+    setSheetName(title || 'Untitled Sheet');
   };
   
   const selectedNote = notes.find(note => note.id === selectedNoteId) || null;
@@ -222,7 +222,7 @@ const Index = () => {
             <SheetManager
               notes={notes}
               onLoadNotes={handleLoadNotes}
-              onSavedNotes={handleSaveNotes}
+              onNewTitle={handleNewTitle}
               onClearNotes={handleClearNotes}
             />
           </div>
