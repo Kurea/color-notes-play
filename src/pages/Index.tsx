@@ -23,7 +23,6 @@ const Index = () => {
   const [detectedNote, setDetectedNote] = useState<string | null>(null);
   const [signalStrength, setSignalStrength] = useState(0);
   const [sheetName, setSheetName] = useState<string>("Untitled Sheet");
-  const [listenerName, setListenerName] = useState<string>("No listener");
   
   const audioContextRef = useRef<{
     audioContext: AudioContextType;
@@ -84,6 +83,10 @@ const Index = () => {
     if (title) {
       setSheetName(title);
     }
+  };
+
+  const handleSaveNotes = (title: string) => {
+    setSheetName(title);
   };
   
   const selectedNote = notes.find(note => note.id === selectedNoteId) || null;
@@ -218,6 +221,7 @@ const Index = () => {
             <SheetManager
               notes={notes}
               onLoadNotes={handleLoadNotes}
+              onSavedNotes={handleSaveNotes}
               onClearNotes={handleClearNotes}
             />
           </div>

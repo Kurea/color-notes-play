@@ -20,6 +20,7 @@ interface SaveSheetDialogProps {
   onOpenChange: (open: boolean) => void;
   notes: Note[];
   userId: string | undefined;
+  onSaveSheet: (title: string) => void;
   onSheetSaved: () => void;
 }
 
@@ -28,6 +29,7 @@ const SaveSheetDialog: React.FC<SaveSheetDialogProps> = ({
   onOpenChange,
   notes,
   userId,
+  onSaveSheet,
   onSheetSaved
 }) => {
   const [newSheetTitle, setNewSheetTitle] = useState('');
@@ -71,6 +73,7 @@ const SaveSheetDialog: React.FC<SaveSheetDialogProps> = ({
 
       toast.success('Sheet saved successfully!');
       onOpenChange(false);
+      onSaveSheet(newSheetTitle);
       setNewSheetTitle('');
       onSheetSaved();
     } catch (error) {

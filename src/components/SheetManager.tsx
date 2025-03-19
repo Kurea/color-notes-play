@@ -11,6 +11,7 @@ import SheetManagerActions from './sheet-manager/SheetManagerActions';
 interface SheetManagerProps {
   notes: Note[];
   onLoadNotes: (notes: Note[], title: string) => void;
+  onSavedNotes: (title: string) => void;
   onClearNotes: () => void;
 }
 
@@ -21,7 +22,7 @@ interface MusicSheet {
   created_at: string;
 }
 
-const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClearNotes }) => {
+const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onSavedNotes, onClearNotes }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
   const [sheets, setSheets] = useState<MusicSheet[]>([]);
@@ -85,6 +86,11 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
     toast.success(`Loaded "${sheet.title}"`);
   };
 
+  const handleSaveSheet = (title: string) => {
+    onSavedNotes(title);
+    toast.success(`Saved "${title}"`);
+  }
+
   const handleNewSheet = () => {
     onClearNotes();
     toast.success('Created new empty sheet');
@@ -115,6 +121,7 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onClear
         onOpenChange={setIsSaveDialogOpen}
         notes={notes}
         userId={user?.id}
+        onSaveSheet={handleSaveSheet}
         onSheetSaved={fetchUserSheets}
       />
 
