@@ -18,7 +18,7 @@ const Note: React.FC<NoteProps> = ({ note, isSelected, onSelect }) => {
     // Staff has 5 lines, with notes possibly extending above and below
     // Position 0 = bottom line of staff
     const lineHeight = 32;
-    const basePosition = 4 * lineHeight - 25; // Bottom line position
+    const basePosition = 4 * lineHeight - 25 + 75; // Bottom line position
     
     // Calculate vertical position (higher position = lower on staff)
     const topPosition = basePosition - (note.position * lineHeight / 2);
