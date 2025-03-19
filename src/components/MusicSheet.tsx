@@ -41,7 +41,7 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
     <div className="w-full overflow-hidden glass p-4 rounded-lg animate-fade-in">
       <div 
         ref={sheetRef}
-        className="relative w-full music-sheet rounded-md bg-white/80 border border-gray-200 p-4 overflow-y-auto"
+        className="relative w-full music-sheet rounded-md bg-white/80 border border-gray-200 p-4 overflow-x-auto overflow-y-hidden"
         style={{ height: '350px' }}
       >
         {/* Clef on the left */}
