@@ -32,7 +32,12 @@ const Note: React.FC<NoteProps> = ({ note }) => {
       case 'whole':
         return <div className="w-8 h-8 rounded-full border-2 border-current bg-white" />;
       case 'half':
-        return <div className="w-8 h-8 rounded-full bg-current" />;
+        return (
+          <div className="flex items-start">
+            <div className="w-8 h-8 rounded-full border-2 border-current bg-white" />
+            <div className="h-16 w-0.5 bg-current -ml-1 -translate-y-1/2" />
+          </div>
+        );
       case 'quarter':
         return (
           <div className="flex items-start">
