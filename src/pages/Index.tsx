@@ -92,14 +92,15 @@ const Index = () => {
   const selectedNote = notes.find(note => note.id === selectedNoteId) || null;
   
   const updateActiveNotes = (detectedNoteString: string | null) => {
-    const baseNoteName = getBaseNoteName(detectedNoteString);
+//    const baseNoteName = getBaseNoteName(detectedNoteString);
     const nextNoteIndex = notes.findIndex(note => note.isActive === false);
     const nextNote = notes[nextNoteIndex];
+    const nextNoteString = `${nextNote.value.toUpperCase()}${nextNote.accidental === 'sharp' ? '#' : nextNote.accidental === 'flat' ? 'b' : ''}${nextNote.octave}`;
     
-    if (baseNoteName && nextNote) {
-      console.log("Detected note base name:", baseNoteName);
-      console.log("Next note:", nextNote.value);
-      if(baseNoteName === nextNote.value) {
+    if (detectedNoteString && nextNoteString) {
+      const detectedNotesArray = detectedNoteString.split('/')
+      console.log("Detected note / next note / match ? :", detectedNotesArray, "-",nextNoteString, detectedNotesArray.includes(nextNoteString)) ;
+      if(detectedNotesArray.includes(nextNoteString)) {
         setNotes(prevNotes => {
           prevNotes[nextNoteIndex].isActive = true;
           return prevNotes;

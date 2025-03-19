@@ -29,7 +29,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({
   // Update input when selected note changes
   useEffect(() => {
     if (selectedNote) {
-      const noteString = `${selectedNote.value.toUpperCase()}${selectedNote.octave}${selectedNote.accidental === 'sharp' ? '#' : selectedNote.accidental === 'flat' ? 'b' : ''}`;
+      const noteString = `${selectedNote.value.toUpperCase()}${selectedNote.accidental === 'sharp' ? '#' : selectedNote.accidental === 'flat' ? 'b' : ''}${selectedNote.octave}`;
       setNoteInput(noteString);
       setDuration(selectedNote.duration);
     }
