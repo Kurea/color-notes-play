@@ -83,7 +83,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium flex items-center gap-1.5">
           <Music2 className="h-4 w-4" />
-          <span>{isEditing ? 'Edit Note' : 'Note Editor'}</span>
+          <span>{isEditing ? 'Edit Note' : 'Add Note'}</span>
         </h3>
         {isEditing && (
           <Button 

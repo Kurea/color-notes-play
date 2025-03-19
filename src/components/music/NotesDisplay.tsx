@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Note as NoteType } from '@/utils/musicTheory';
 import Note from './Note';
+
 
 interface NotesDisplayProps {
   notes: NoteType[];

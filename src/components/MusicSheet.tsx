@@ -37,6 +37,18 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
+  // Auto-scroll to the end when notes are added
+  useEffect(() => {
+    if (sheetRef.current) {
+      // Scroll to the far right to show the newly added note
+      sheetRef.current.scrollTo({
+        left: sheetRef.current.scrollWidth,
+        behavior: 'smooth'
+      });
+    }
+  }, [notes.length]); // Only run when the number of notes changes
+
+
   return (
     <div className="w-full overflow-hidden glass p-4 rounded-lg animate-fade-in">
       <div 
