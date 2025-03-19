@@ -105,7 +105,7 @@ const Note: React.FC<NoteProps> = ({ note, isSelected, onSelect }) => {
           <div 
             key={`ledger-${i}`} 
             className="absolute w-10 h-0.5 bg-gray-300 left-1/2 -translate-x-1/2"
-            style={{ top: `${(-i * 8)}px` }}
+            style={{ top: `${((note.position-i+1) * 16)}px` }}
           />
         );
       }
@@ -116,7 +116,7 @@ const Note: React.FC<NoteProps> = ({ note, isSelected, onSelect }) => {
           <div 
             key={`ledger-${i}`} 
             className="absolute w-10 h-0.5 bg-gray-300 left-1/2 -translate-x-1/2"
-            style={{ top: `${(-i * 8)}px` }}
+            style={{ top: `${((note.position-i+1) * 16)}px` }}
           />
         );
       }

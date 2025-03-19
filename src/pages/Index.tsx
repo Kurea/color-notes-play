@@ -5,7 +5,7 @@ import MusicSheet from '@/components/MusicSheet';
 import NoteEditor from '@/components/NoteEditor';
 import MicrophoneControl from '@/components/MicrophoneControl';
 import SheetManager from '@/components/SheetManager';
-import { Note, getDefaultNotes, getBaseNoteName } from '@/utils/musicTheory';
+import { Note, getDefaultNotes, getBaseNoteName, calculateNotePosition } from '@/utils/musicTheory';
 import { 
   AudioContextType, 
   AnalyserNodeType,
@@ -53,7 +53,7 @@ const Index = () => {
               ...updatedFields,
               // Recalculate position if value or octave changed
               position: updatedFields.value || updatedFields.octave 
-                ? note.position // This is a simplification - in reality you'd recalculate using calculateNotePosition
+                ? calculateNotePosition(updatedFields.value || note.value, updatedFields.octave || note.octave, 'treble')
                 : note.position
             }
           : note
