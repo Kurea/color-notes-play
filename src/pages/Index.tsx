@@ -6,7 +6,7 @@ import MicrophoneControl from '@/components/MicrophoneControl';
 import SheetManager from '@/components/SheetManager';
 import TempoControl from '@/components/TempoControl';
 import MusicSheetContainer from '@/components/MusicSheetContainer';
-import { Note, getDefaultNotes } from '@/utils/musicTheory';
+import { Note, getDefaultNotes, calculateNotePosition } from '@/utils/musicTheory';
 import { MetronomeProvider, useMetronome } from '@/providers/MetronomeProvider';
 import { NoteDetectionProvider, useNoteDetection } from '@/providers/NoteDetectionProvider';
 import { toast } from 'sonner';
@@ -73,9 +73,6 @@ const Index = () => {
   };
   
   const selectedNote = notes.find(note => note.id === selectedNoteId) || null;
-  
-  // Import calculateNotePosition from musicTheory
-  const { calculateNotePosition } = require('@/utils/musicTheory');
 
   return (
     <MetronomeProvider>
