@@ -1,4 +1,3 @@
-
 /**
  * Audio utilities for note detection
  */
@@ -47,13 +46,20 @@ const NOTE_FREQUENCIES: Record<string, number> = {
   'C6': 1046.50,
 };
 
+// Object to store samples for note detection on beat
+type AudioSample = {
+  frequency: number;
+  note: string | null;
+};
+
 // Initialize audio context and analyzer
 export const initAudioContext = () => {
   let audioContext: AudioContextType = null;
   let analyser: AnalyserNodeType = null;
   let mediaStream: MediaStream | null = null;
   let source: MediaStreamAudioSourceNode | null = null;
-
+  let sampleBuffer: AudioSample[] = [];
+  
   const start = async (): Promise<void> => {
     try {
       audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -89,6 +95,49 @@ export const initAudioContext = () => {
     }
     
     analyser = null;
+    sampleBuffer = [];
+  };
+  
+  // Store a sample for beat detection
+  const addSample = (frequency: number, note: string | null): void => {
+    sampleBuffer.push({ frequency, note });
+    // Keep only the last 4 samples
+    if (sampleBuffer.length > 4) {
+      sampleBuffer.shift();
+    }
+  };
+  
+  // Get the most frequent note from the buffer (for beat detection)
+  const getMostFrequentNote = (): string | null => {
+    if (sampleBuffer.length === 0) return null;
+    
+    // Count notes
+    const noteCounts: Record<string, number> = {};
+    
+    sampleBuffer.forEach(sample => {
+      if (sample.note) {
+        noteCounts[sample.note] = (noteCounts[sample.note] || 0) + 1;
+      }
+    });
+    
+    // Find the most frequent note
+    let mostFrequentNote: string | null = null;
+    let highestCount = 0;
+    
+    Object.entries(noteCounts).forEach(([note, count]) => {
+      if (count > highestCount) {
+        mostFrequentNote = note;
+        highestCount = count;
+      }
+    });
+    
+    // Only return if the note appears in at least 2 samples
+    return highestCount >= 2 ? mostFrequentNote : null;
+  };
+  
+  // Clear the buffer
+  const clearSamples = (): void => {
+    sampleBuffer = [];
   };
 
   return {
@@ -100,6 +149,9 @@ export const initAudioContext = () => {
     },
     start,
     stop,
+    addSample,
+    getMostFrequentNote,
+    clearSamples
   };
 };
 

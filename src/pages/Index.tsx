@@ -5,6 +5,7 @@ import MusicSheet from '@/components/MusicSheet';
 import NoteEditor from '@/components/NoteEditor';
 import MicrophoneControl from '@/components/MicrophoneControl';
 import SheetManager from '@/components/SheetManager';
+import TempoControl from '@/components/TempoControl';
 import { Note, getDefaultNotes, getBaseNoteName, calculateNotePosition } from '@/utils/musicTheory';
 import { 
   AudioContextType, 
@@ -13,6 +14,7 @@ import {
   detectDominantFrequency, 
   detectNote,
 } from '@/utils/audioUtils';
+import { startMetronome } from '@/utils/metronomeUtils';
 import { toast } from 'sonner';
 import { FileMusic, Headphones } from 'lucide-react';
 
@@ -24,11 +26,19 @@ const Index = () => {
   const [signalStrength, setSignalStrength] = useState(0);
   const [sheetName, setSheetName] = useState<string>("Untitled Sheet");
   
+  // Tempo control state
+  const [tempo, setTempo] = useState<number>(80); // Default 80 BPM
+  const [metronomeActive, setMetronomeActive] = useState(false);
+  const metronomeRef = useRef<{ stopMetronome: () => void } | null>(null);
+  
   const audioContextRef = useRef<{
     audioContext: AudioContextType;
     analyser: AnalyserNodeType;
     start: () => Promise<void>;
     stop: () => void;
+    addSample: (frequency: number, note: string | null) => void;
+    getMostFrequentNote: () => string | null;
+    clearSamples: () => void;
   }>(initAudioContext());
   
   const animationFrameRef = useRef<number | null>(null);
@@ -89,23 +99,72 @@ const Index = () => {
     setSheetName(title || 'Untitled Sheet');
   };
   
+  const handleTempoChange = (newTempo: number) => {
+    setTempo(newTempo);
+    
+    if (metronomeActive) {
+      // Restart metronome with new tempo
+      stopMetronome();
+      startMetronomeWithTempo(newTempo);
+    }
+  };
+  
+  const handleMetronomeToggle = (isActive: boolean) => {
+    setMetronomeActive(isActive);
+    
+    if (isActive) {
+      startMetronomeWithTempo(tempo);
+    } else {
+      stopMetronome();
+    }
+  };
+  
+  const startMetronomeWithTempo = (bpm: number) => {
+    if (!audioContextRef.current.audioContext) return;
+    
+    const metronome = startMetronome(
+      audioContextRef.current.audioContext,
+      bpm,
+      (beat) => {
+        // On each beat, check the most frequent note from the buffer
+        const mostFrequentNote = audioContextRef.current.getMostFrequentNote();
+        
+        if (mostFrequentNote) {
+          checkNextNoteMatch(mostFrequentNote);
+        }
+        
+        // Clear samples after each beat
+        audioContextRef.current.clearSamples();
+      }
+    );
+    
+    metronomeRef.current = metronome;
+  };
+  
+  const stopMetronome = () => {
+    if (metronomeRef.current) {
+      metronomeRef.current.stopMetronome();
+      metronomeRef.current = null;
+    }
+  };
+  
   const selectedNote = notes.find(note => note.id === selectedNoteId) || null;
   
-  const updateActiveNotes = (detectedNoteString: string | null) => {
-//    const baseNoteName = getBaseNoteName(detectedNoteString);
+  const checkNextNoteMatch = (detectedNoteString: string | null) => {
     const nextNoteIndex = notes.findIndex(note => note.isActive === false);
+    if (nextNoteIndex === -1) return; // All notes are already active
+    
     const nextNote = notes[nextNoteIndex];
     const nextNoteString = `${nextNote.value.toUpperCase()}${nextNote.accidental === 'sharp' ? '#' : nextNote.accidental === 'flat' ? 'b' : ''}${nextNote.octave}`;
     
     if (detectedNoteString && nextNoteString) {
-      const detectedNotesArray = detectedNoteString.split('/')
-      console.log("Detected note / next note / match ? :", detectedNotesArray, "-",nextNoteString, detectedNotesArray.includes(nextNoteString)) ;
-      if(detectedNotesArray.includes(nextNoteString)) {
+      const detectedNotesArray = detectedNoteString.split('/');
+      if (detectedNotesArray.includes(nextNoteString)) {
         setNotes(prevNotes => {
-          prevNotes[nextNoteIndex].isActive = true;
-          return prevNotes;
-        }
-        );
+          const newNotes = [...prevNotes];
+          newNotes[nextNoteIndex].isActive = true;
+          return newNotes;
+        });
       }
     }
   };
@@ -134,7 +193,14 @@ const Index = () => {
           setSignalStrength(strength);
           
           setDetectedNote(currentNote);
-          updateActiveNotes(currentNote);
+          
+          // Add current sample to the buffer for beat detection
+          audioContextRef.current.addSample(frequency, currentNote);
+          
+          // Only update active notes directly if metronome is off
+          if (!metronomeActive) {
+            checkNextNoteMatch(currentNote);
+          }
           
           animationFrameRef.current = requestAnimationFrame(processAudio);
         };
@@ -151,6 +217,9 @@ const Index = () => {
         animationFrameRef.current = null;
       }
       
+      stopMetronome();
+      setMetronomeActive(false);
+      
       audioContextRef.current.stop();
       
       setDetectedNote(null);
@@ -163,6 +232,7 @@ const Index = () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      stopMetronome();
       audioContextRef.current.stop();
     };
   }, []);
@@ -217,6 +287,13 @@ const Index = () => {
             />
           </div>
           <div className="md:col-span-1">
+            <TempoControl
+              tempo={tempo}
+              onTempoChange={handleTempoChange}
+              isMetronomeActive={metronomeActive}
+              onMetronomeToggle={handleMetronomeToggle}
+              isMicrophoneActive={microphoneActive}
+            />
           </div>          
           <div className="md:col-span-1">
             <SheetManager
