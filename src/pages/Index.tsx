@@ -7,8 +7,8 @@ import SheetManager from '@/components/SheetManager';
 import TempoControl from '@/components/TempoControl';
 import MusicSheetContainer from '@/components/MusicSheetContainer';
 import { Note, getDefaultNotes } from '@/utils/musicTheory';
-import { MetronomeProvider } from '@/providers/MetronomeProvider';
-import { NoteDetectionProvider } from '@/providers/NoteDetectionProvider';
+import { MetronomeProvider, useMetronome } from '@/providers/MetronomeProvider';
+import { NoteDetectionProvider, useNoteDetection } from '@/providers/NoteDetectionProvider';
 import { toast } from 'sonner';
 
 const Index = () => {
