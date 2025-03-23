@@ -7,9 +7,10 @@ interface NoteProps {
   note: NoteType;
   isSelected: boolean;
   onSelect: (note: NoteType) => void;
+  isMissed?: boolean;
 }
 
-const Note: React.FC<NoteProps> = ({ note, isSelected, onSelect }) => {
+const Note: React.FC<NoteProps> = ({ note, isSelected, onSelect, isMissed = false }) => {
   const isActive = note.isActive;
   
   // Calculate note position on staff
@@ -142,7 +143,7 @@ const Note: React.FC<NoteProps> = ({ note, isSelected, onSelect }) => {
       <div 
         className={cn(
           "transition-colors duration-300 ease-spring",
-          isActive ? `text-note-${note.value}` : "text-gray-800"
+          isMissed ? "text-red-600" : isActive ? `text-note-${note.value}` : "text-gray-800"
         )}
       >
         {renderAccidental()}

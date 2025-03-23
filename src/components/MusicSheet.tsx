@@ -9,13 +9,15 @@ interface MusicSheetProps {
   staffType?: StaffType;
   selectedNoteId: string | null;
   onSelectNote: (note: Note) => void;
+  missedNotes?: string[];
 }
 
 const MusicSheet: React.FC<MusicSheetProps> = ({
   notes,
   staffType = 'treble',
   selectedNoteId,
-  onSelectNote
+  onSelectNote,
+  missedNotes = []
 }) => {
   const sheetRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -64,6 +66,7 @@ const MusicSheet: React.FC<MusicSheetProps> = ({
           notes={notes} 
           selectedNoteId={selectedNoteId}
           onSelectNote={onSelectNote}
+          missedNotes={missedNotes}
         />
       </div>
     </div>

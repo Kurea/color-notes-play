@@ -8,9 +8,15 @@ interface NotesDisplayProps {
   notes: NoteType[];
   selectedNoteId: string | null;
   onSelectNote: (note: NoteType) => void;
+  missedNotes?: string[];
 }
 
-const NotesDisplay: React.FC<NotesDisplayProps> = ({ notes, selectedNoteId, onSelectNote }) => {
+const NotesDisplay: React.FC<NotesDisplayProps> = ({
+  notes,
+  selectedNoteId,
+  onSelectNote,
+  missedNotes = []
+}) => {
   return (
     <div className="flex items-start pl-16 pr-16 gap-14 mt-6 notes-display">
       {notes.map((note) => (
@@ -19,6 +25,7 @@ const NotesDisplay: React.FC<NotesDisplayProps> = ({ notes, selectedNoteId, onSe
           note={note}
           isSelected={note.id === selectedNoteId}
           onSelect={onSelectNote}
+          isMissed={missedNotes.includes(note.id)}
         />
       ))}
       <div className="p-0.5"></div>
