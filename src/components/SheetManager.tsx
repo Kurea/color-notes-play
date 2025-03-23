@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import SaveSheetDialog from './sheet-manager/SaveSheetDialog';
 import OpenSheetDialog from './sheet-manager/OpenSheetDialog';
 import SheetManagerActions from './sheet-manager/SheetManagerActions';
+import { useMetronome } from '@/providers/MetronomeProvider';
 
 interface SheetManagerProps {
   notes: Note[];
@@ -19,10 +20,12 @@ interface MusicSheet {
   id: string;
   title: string;
   notes: Note[];
+  tempo?: number;
   created_at: string;
 }
 
 const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onNewTitle, onClearNotes }) => {
+  const { tempo, setTempo } = useMetronome();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
   const [sheets, setSheets] = useState<MusicSheet[]>([]);
@@ -84,6 +87,12 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onNewTi
   const handleLoadSheet = (sheet: MusicSheet) => {
     setCurrentSheet(sheet);
     onLoadNotes(sheet.notes, sheet.title);
+    
+    // Set tempo if available in the loaded sheet
+    if (sheet.tempo) {
+      setTempo(sheet.tempo);
+    }
+    
     setIsOpenDialogOpen(false);
     toast.success(`Loaded "${sheet.title}"`);
   };
@@ -96,8 +105,8 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onNewTi
 
   const handleNewSheet = () => {
     onClearNotes();
-    setCurrentSheet(undefined);
-    onNewTitle(undefined);
+    setCurrentSheet(null);
+    onNewTitle('Untitled Sheet');
     toast.success('Created new empty sheet');
   };
 
@@ -129,6 +138,7 @@ const SheetManager: React.FC<SheetManagerProps> = ({ notes, onLoadNotes, onNewTi
         userId={user?.id}
         onSaveSheet={handleSaveSheet}
         onSheetSaved={fetchUserSheets}
+        tempo={tempo}
       />
 
       <OpenSheetDialog 

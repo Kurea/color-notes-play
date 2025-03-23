@@ -14,12 +14,12 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Note } from '@/utils/musicTheory';
 import { Json } from '@/integrations/supabase/types';
-import { Currency } from 'lucide-react';
 
 interface MusicSheet {
   id: string;
   title: string;
   notes: Note[];
+  tempo?: number;
   created_at: string;
 }
 
@@ -31,6 +31,7 @@ interface SaveSheetDialogProps {
   userId: string | undefined;
   onSaveSheet: (sheet: MusicSheet) => void;
   onSheetSaved: () => void;
+  tempo: number;
 }
 
 const SaveSheetDialog: React.FC<SaveSheetDialogProps> = ({
@@ -40,7 +41,8 @@ const SaveSheetDialog: React.FC<SaveSheetDialogProps> = ({
   currentSheet,
   userId,
   onSaveSheet,
-  onSheetSaved
+  onSheetSaved,
+  tempo
 }) => {
   const [newSheetTitle, setNewSheetTitle] = useState((currentSheet)?currentSheet.title:'');
   const [isLoading, setIsLoading] = useState(false);
@@ -71,6 +73,7 @@ const SaveSheetDialog: React.FC<SaveSheetDialogProps> = ({
       const sheetData = {
         title: newSheetTitle,
         notes: notes as unknown as Json,
+        tempo: tempo,
         user_id: userId
       };
       if(currentSheet) {
