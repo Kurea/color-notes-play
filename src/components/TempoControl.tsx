@@ -32,12 +32,6 @@ const TempoControl: React.FC<TempoControlProps> = ({
   
   const handleMetronomeToggle = () => {
     const newState = !isMetronomeActive;
-    
-    if (newState && !isMicrophoneActive) {
-      toast.error('Please turn on the microphone first');
-      return;
-    }
-    
     onMetronomeToggle(newState);
     
     if (newState) {
@@ -82,7 +76,6 @@ const TempoControl: React.FC<TempoControlProps> = ({
               "h-8 w-8 p-0",
               isMetronomeActive ? "bg-primary text-primary-foreground" : ""
             )}
-            disabled={!isMicrophoneActive}
           >
             {isMetronomeActive ? (
               <Square className="h-4 w-4" />

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
 import MusicSheet from '@/components/MusicSheet';
@@ -42,6 +41,9 @@ const Index = () => {
   }>(initAudioContext());
   
   const animationFrameRef = useRef<number | null>(null);
+
+  // We need to add a metronome audio context that's separate from the microphone audio context
+  const metronomeAudioContextRef = useRef<AudioContext | null>(null);
   
   const handleAddNote = (newNote: Note) => {
     setNotes(prevNotes => [...prevNotes, newNote]);
@@ -120,21 +122,27 @@ const Index = () => {
   };
   
   const startMetronomeWithTempo = (bpm: number) => {
-    if (!audioContextRef.current.audioContext) return;
+    // Create audio context for metronome if it doesn't exist
+    if (!metronomeAudioContextRef.current) {
+      metronomeAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
     
     const metronome = startMetronome(
-      audioContextRef.current.audioContext,
+      metronomeAudioContextRef.current,
       bpm,
       (beat) => {
-        // On each beat, check the most frequent note from the buffer
-        const mostFrequentNote = audioContextRef.current.getMostFrequentNote();
-        
-        if (mostFrequentNote) {
-          checkNextNoteMatch(mostFrequentNote);
+        // Only use samples from microphone if it's active
+        if (microphoneActive) {
+          // On each beat, check the most frequent note from the buffer
+          const mostFrequentNote = audioContextRef.current.getMostFrequentNote();
+          
+          if (mostFrequentNote) {
+            checkNextNoteMatch(mostFrequentNote);
+          }
+          
+          // Clear samples after each beat
+          audioContextRef.current.clearSamples();
         }
-        
-        // Clear samples after each beat
-        audioContextRef.current.clearSamples();
       }
     );
     
@@ -217,8 +225,8 @@ const Index = () => {
         animationFrameRef.current = null;
       }
       
-      stopMetronome();
-      setMetronomeActive(false);
+      // Don't stop metronome when microphone is turned off
+      // This allows metronome to continue independently
       
       audioContextRef.current.stop();
       
@@ -233,6 +241,12 @@ const Index = () => {
         cancelAnimationFrame(animationFrameRef.current);
       }
       stopMetronome();
+      
+      // Close metronome audio context
+      if (metronomeAudioContextRef.current) {
+        metronomeAudioContextRef.current.close();
+      }
+      
       audioContextRef.current.stop();
     };
   }, []);

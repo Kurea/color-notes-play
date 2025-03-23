@@ -24,7 +24,8 @@ export const startMetronome = (
   tempo: number,
   onBeat: (beat: number) => void
 ): { stopMetronome: () => void } => {
-  if (!audioContext) return { stopMetronome: () => {} };
+  // Create audio context if one doesn't exist
+  const ctx = audioContext || new (window.AudioContext || (window as any).webkitAudioContext)();
   
   let beatCount = 0;
   let intervalId: number | null = null;
@@ -34,8 +35,8 @@ export const startMetronome = (
   
   // Function to play a single beat
   const playBeat = () => {
-    const oscillator = createMetronomeSound(audioContext);
-    const currentTime = audioContext.currentTime;
+    const oscillator = createMetronomeSound(ctx);
+    const currentTime = ctx.currentTime;
     
     // Make first beat of each measure slightly louder
     if (beatCount % 4 === 0) {
