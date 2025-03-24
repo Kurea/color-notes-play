@@ -25,7 +25,7 @@ const MusicSheetContainer: React.FC<MusicSheetContainerProps> = ({
   const { microphoneActive, getMostFrequentNote, clearSamples } = useNoteDetection();
   const [currentBeatIndex, setCurrentBeatIndex] = useState(0);
   const [missedNotes, setMissedNotes] = useState<string[]>([]);
-  const notesPlayedRef = useRef<boolean>(false);
+  const firstCorrectNotePlayedRef = useRef<boolean>(false);
 
   // Set up beat callback for metronome
   useEffect(() => {
@@ -38,10 +38,18 @@ const MusicSheetContainer: React.FC<MusicSheetContainerProps> = ({
         const mostFrequentNote = getMostFrequentNote();
         
         if (mostFrequentNote) {
-          notesPlayedRef.current = true;
-          checkNextNoteMatch(mostFrequentNote);
-        } else if (notesPlayedRef.current) {
-          // If we've started playing notes but missed this beat
+          // Try to match the current note
+          const wasCorrectNote = checkNextNoteMatch(mostFrequentNote);
+          
+          // Only start tracking missed notes after the first correct note is played
+          if (wasCorrectNote) {
+            firstCorrectNotePlayedRef.current = true;
+          } else if (firstCorrectNotePlayedRef.current) {
+            // If we've already played the first correct note but this one is wrong, mark as missed
+            markMissedNote();
+          }
+        } else if (firstCorrectNotePlayedRef.current) {
+          // If we've started playing correct notes but missed this beat
           markMissedNote();
         }
         
@@ -51,9 +59,9 @@ const MusicSheetContainer: React.FC<MusicSheetContainerProps> = ({
     });
   }, [metronomeActive, microphoneActive, onBeat, getMostFrequentNote, clearSamples, notes]);
 
-  const checkNextNoteMatch = (detectedNoteString: string | null) => {
+  const checkNextNoteMatch = (detectedNoteString: string | null): boolean => {
     const nextNoteIndex = notes.findIndex(note => note.isActive === false);
-    if (nextNoteIndex === -1) return; // All notes are already active
+    if (nextNoteIndex === -1) return false; // All notes are already active
     
     const nextNote = notes[nextNoteIndex];
     const nextNoteString = `${nextNote.value.toUpperCase()}${nextNote.accidental === 'sharp' ? '#' : nextNote.accidental === 'flat' ? 'b' : ''}${nextNote.octave}`;
@@ -72,8 +80,12 @@ const MusicSheetContainer: React.FC<MusicSheetContainerProps> = ({
         if (missedNotes.includes(nextNote.id)) {
           setMissedNotes(prev => prev.filter(id => id !== nextNote.id));
         }
+        
+        return true; // Indicate that a correct note was played
       }
     }
+    
+    return false; // No match was found
   };
 
   const markMissedNote = () => {
@@ -93,7 +105,7 @@ const MusicSheetContainer: React.FC<MusicSheetContainerProps> = ({
   useEffect(() => {
     setMissedNotes([]);
     setCurrentBeatIndex(0);
-    notesPlayedRef.current = false;
+    firstCorrectNotePlayedRef.current = false;
   }, [notes]);
 
   return (
